@@ -2,8 +2,17 @@
     <string name="app_name">GeoQuiz</string>
     <string name="main_btn_true">true</string>
     <string name="main_btn_false">false</string>
-    <string name="main_tv_text">Canberra is the capital of Australia.</string>
     <string name="correct_toast">Correct!</string>
     <string name="incorrect_toast">Incorrect!</string>
+    <string name="main_btn_next">next</string>
+
+    <string name="q_australia">Canberra is the capital of Australia.</string>
+    <string name="q_oceans">The Pacific Ocean is larger then the Atlantic Ocean.</string>
+    <string name="q_mideast">The Suez Canal connects the Red Sea and the Indian Ocean.</string>
+    <string name="q_africa">The source of the Nile River is in Egypt.</string>
+    <string name="q_americas">The Amazon River is the longest river in the America.</string>
+    <string name="q_asia">Lake Baikal is the world\'s oldest and deepest freshwater lake.</string>
+    <string name="main_btn_prev">prev</string>
+
 
 </resources>
