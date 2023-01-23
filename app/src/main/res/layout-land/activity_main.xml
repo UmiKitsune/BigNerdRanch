@@ -4,52 +4,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
-        android:id="@+id/right_answers_layout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:visibility="gone"
-
-        android:orientation="vertical">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:textSize="18sp"
-            android:text="@string/right_answers"/>
-
-        <TextView
-            android:id="@+id/percent"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:textColor="@color/black"
-            android:textSize="20sp"
-            tools:text="100%"/>
-    </LinearLayout>
-
-
-<LinearLayout
-    android:id="@+id/question_layout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical"
-    tools:context=".MainActivity">
-
     <TextView
         android:id="@+id/question_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
+        android:layout_gravity="center_horizontal"
         android:padding="24dp"
         tools:text="@string/q_australia" />
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_gravity="center_vertical|center_horizontal">
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/true_button"
@@ -64,25 +30,19 @@
             android:text="@string/main_btn_false"/>
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
 
         <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/prev_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_arrow_left_24"/>
+            android:src="@drawable/ic_arrow_left_24"
+            android:layout_gravity="bottom|start"/>
 
         <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/next_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_arrow_right_24"/>
-    </LinearLayout>
+            android:src="@drawable/ic_arrow_right_24"
+            android:layout_gravity="bottom|end"/>
 
-
-
-</LinearLayout>
 </FrameLayout>
