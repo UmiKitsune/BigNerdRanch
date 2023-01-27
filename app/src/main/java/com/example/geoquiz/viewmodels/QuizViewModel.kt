@@ -1,12 +1,13 @@
-package com.example.geoquiz
+package com.example.geoquiz.viewmodels
 
 import androidx.lifecycle.ViewModel
-
-private const val TAG = "QuizViewModel"
+import com.example.geoquiz.Question
+import com.example.geoquiz.R
 
 class QuizViewModel : ViewModel() {
 
     var currentIndex = 0
+    var isCheater = false
 
 
     private val questionBank = listOf(
@@ -28,6 +29,7 @@ class QuizViewModel : ViewModel() {
         get() = questionBank.size
 
     fun moveToNext() {
+        //currentIndex = (currentIndex + 1) % questionBank.size
         currentIndex += 1
     }
 

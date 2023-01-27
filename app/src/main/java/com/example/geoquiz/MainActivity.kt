@@ -1,74 +1,78 @@
 package com.example.geoquiz
 
+import android.app.Activity
 import android.os.Bundle
-import android.os.PersistableBundle
-import android.util.Log
 import android.view.Gravity.TOP
 import android.view.View
-import android.widget.*
+import android.widget.Button
+import android.widget.LinearLayout
+import android.widget.TextView
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import com.example.geoquiz.databinding.ActivityMainBinding
+import com.example.geoquiz.viewmodels.QuizViewModel
 
-private const val TAG = "MainActivity"
 private const val KEI_INDEX = "KeyIndex"
 private const val KEI_INDEX_FLAG = "KeyIndexFlag"
+private const val REQUEST_CODE_CHEAT = 0
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var trueButton: Button
-    private lateinit var falseButton: Button
-    private lateinit var questionTextView: TextView
-    private lateinit var percentTV: TextView
-    private lateinit var nextButton: ImageButton
-    private lateinit var questionLayout: LinearLayout
-    private lateinit var rightAnswersLayout: LinearLayout
+    private lateinit var binding: ActivityMainBinding
 
     private val quizViewModel: QuizViewModel by lazy {
         ViewModelProvider(this)[QuizViewModel::class.java]
     }
 
+    private val getResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
+        if (it.resultCode == Activity.RESULT_OK) {
+            quizViewModel.isCheater = it.data?.getBooleanExtra(EXTRA_ANSWER_SHOWN, false) ?: false
+        }
+    }
+
     private var rightAnswers = 0
     private var answeredFlag = false
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater).also { setContentView(it.root) }
+
 
         rightAnswers = savedInstanceState?.getInt(KEI_INDEX, 0) ?: 0
         answeredFlag = savedInstanceState?.getBoolean(KEI_INDEX_FLAG, false) ?: false
 
-        questionTextView = findViewById(R.id.question_text_view)
-        trueButton = findViewById(R.id.true_button)
-        falseButton = findViewById(R.id.false_button)
-        nextButton = findViewById(R.id.next_button)
-        questionLayout = findViewById(R.id.question_layout)
-        rightAnswersLayout = findViewById(R.id.right_answers_layout)
-        percentTV = findViewById(R.id.percent)
-
         updateQuestion()
 
-        trueButton.setOnClickListener { view: View ->
+        binding.trueButton.setOnClickListener {
             answeredFlag = true
             checkAnswer(true)
         }
 
-        falseButton.setOnClickListener { view: View ->
+        binding.falseButton.setOnClickListener {
             answeredFlag = true
             checkAnswer(false)
         }
 
-        nextButton.setOnClickListener { view: View ->
+        binding.nextButton.setOnClickListener {
             answeredFlag = false
-            //currentIndex = (currentIndex + 1) % questionBank.size
+            quizViewModel.isCheater = false
             quizViewModel.moveToNext()
             updateQuestion()
         }
 
-        questionTextView.setOnClickListener {
+        binding.questionTextView.setOnClickListener {
             answeredFlag = false
+            quizViewModel.isCheater = false
             quizViewModel.moveToNext()
             updateQuestion()
+        }
+
+        binding.cheatButton.setOnClickListener {
+            val answerIsTrue = quizViewModel.currentQuestionAnswer
+            val intent = CheatActivity.newIntent(this@MainActivity, answerIsTrue)
+            getResult.launch(intent)
         }
     }
 
@@ -81,35 +85,51 @@ class MainActivity : AppCompatActivity() {
     private fun updateQuestion() {
         if (quizViewModel.currentIndex < quizViewModel.bankSize) {
             val questionTextResId = quizViewModel.currentQuestionText
-            questionTextView.setText(questionTextResId)
+            binding.questionTextView.setText(questionTextResId)
             if (answeredFlag) {
-                trueButton.isEnabled = false
-                falseButton.isEnabled = false
+                with(binding) {
+                    trueButton.isEnabled = false
+                    falseButton.isEnabled = false
+                    cheatButton.isEnabled = false
+                }
             } else {
-                trueButton.isEnabled = true
-                falseButton.isEnabled = true
+                with(binding) {
+                    trueButton.isEnabled = true
+                    falseButton.isEnabled = true
+                    cheatButton.isEnabled = true
+                }
             }
         }  else {
-            questionLayout.visibility = View.GONE
-            rightAnswersLayout.visibility = View.VISIBLE
-            val percent = ((rightAnswers / quizViewModel.bankSize) * 100).toInt()
-            percentTV.text = resources.getString(R.string.percent_text, rightAnswers, quizViewModel.bankSize)
+            with(binding) {
+                questionLayout.visibility = View.GONE
+                rightAnswersLayout.visibility = View.VISIBLE
+                percent.text = resources.getString(R.string.percent_text, rightAnswers, quizViewModel.bankSize)
+            }
         }
     }
 
     private fun checkAnswer(userAnswer: Boolean) {
         val correctAnswer = quizViewModel.currentQuestionAnswer
         val messageResId =
-            if (userAnswer == correctAnswer) {
-                rightAnswers += 1
-                R.string.correct_toast
-            } else {
-                rightAnswers += 0
-                R.string.incorrect_toast
+            when {
+                quizViewModel.isCheater -> {
+                    R.string.judgment_toast
+                }
+                userAnswer == correctAnswer -> {
+                    rightAnswers += 1
+                    R.string.correct_toast
+                }
+                else -> {
+                    rightAnswers += 0
+                    R.string.incorrect_toast
+                }
             }
         toastTop(messageResId)
-        trueButton.isEnabled = false
-        falseButton.isEnabled = false
+        with(binding) {
+            trueButton.isEnabled = false
+            falseButton.isEnabled = false
+            cheatButton.isEnabled = false
+        }
     }
 
     private fun toastTop(textRes: Int) {
