@@ -1,26 +1,29 @@
 package com.example.geoquiz
 
+import android.annotation.SuppressLint
 import android.app.Activity
+import android.os.Build
 import android.os.Bundle
 import android.view.Gravity.TOP
 import android.view.View
-import android.widget.Button
-import android.widget.LinearLayout
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityOptionsCompat
 import androidx.lifecycle.ViewModelProvider
 import com.example.geoquiz.databinding.ActivityMainBinding
 import com.example.geoquiz.viewmodels.QuizViewModel
+import kotlin.properties.Delegates
 
 private const val KEI_INDEX = "KeyIndex"
 private const val KEI_INDEX_FLAG = "KeyIndexFlag"
-private const val REQUEST_CODE_CHEAT = 0
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private var rightAnswers = 0
+    private var answeredFlag = false
+    private var cheatCount = 3
 
     private val quizViewModel: QuizViewModel by lazy {
         ViewModelProvider(this)[QuizViewModel::class.java]
@@ -29,12 +32,12 @@ class MainActivity : AppCompatActivity() {
     private val getResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
         if (it.resultCode == Activity.RESULT_OK) {
             quizViewModel.isCheater = it.data?.getBooleanExtra(EXTRA_ANSWER_SHOWN, false) ?: false
+            cheatCount = it.data?.getIntExtra(EXTRA_CHEAT_COUNT, 0) ?: 0
         }
     }
 
-    private var rightAnswers = 0
-    private var answeredFlag = false
 
+    @SuppressLint("RestrictedApi")//для проверки уровня sdk в кнопке cheatButton
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater).also { setContentView(it.root) }
@@ -69,10 +72,15 @@ class MainActivity : AppCompatActivity() {
             updateQuestion()
         }
 
-        binding.cheatButton.setOnClickListener {
+        binding.cheatButton.setOnClickListener { view ->
             val answerIsTrue = quizViewModel.currentQuestionAnswer
-            val intent = CheatActivity.newIntent(this@MainActivity, answerIsTrue)
-            getResult.launch(intent)
+            val intent = CheatActivity.newIntent(this@MainActivity, answerIsTrue, cheatCount)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) { //проверка на подходящий уровень sdk для анимации (если меньше 23)
+                val options = ActivityOptionsCompat.makeClipRevealAnimation(view, 0, 0, view.width, view.height)
+                getResult.launch(intent, options)
+            } else {
+                getResult.launch(intent)
+            }
         }
     }
 
