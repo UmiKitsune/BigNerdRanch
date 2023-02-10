@@ -3,7 +3,6 @@ package com.example.geoquiz
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,7 +26,7 @@ class CrimeFragment : Fragment() {
         binding = FragmentCrimeBinding.inflate(inflater, container, false)
 
         binding.crimeDate.apply {
-            text = crime.data.toString()
+            text = crime.date.toString()
             isEnabled = false
         }
 
