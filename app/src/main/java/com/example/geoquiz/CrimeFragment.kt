@@ -8,6 +8,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.geoquiz.databinding.FragmentCrimeBinding
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.util.*
+import java.util.zip.DataFormatException
 
 class CrimeFragment : Fragment() {
     private lateinit var binding: FragmentCrimeBinding
@@ -26,7 +30,9 @@ class CrimeFragment : Fragment() {
         binding = FragmentCrimeBinding.inflate(inflater, container, false)
 
         binding.crimeDate.apply {
-            text = crime.date.toString()
+            //val formatDate = DateFormat.getDateInstance(DateFormat.MONTH_FIELD).format(crime.date)
+            val formatDate = SimpleDateFormat("EEE, MMM d, yyyy", Locale.ENGLISH).format(crime.date)
+            text = formatDate //crime.date.toString()
             isEnabled = false
         }
 

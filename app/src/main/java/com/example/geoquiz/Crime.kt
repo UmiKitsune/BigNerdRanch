@@ -6,6 +6,5 @@ data class Crime(
     val id: UUID = UUID.randomUUID(), //рандомный уникальный id
     var title: String = "",
     var date: Date = Date(),
-    var isSolved: Boolean = false,
-    var requiresPolice: Boolean = false
+    var isSolved: Boolean = false
 )

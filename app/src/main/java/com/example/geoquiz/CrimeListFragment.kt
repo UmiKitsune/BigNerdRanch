@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.geoquiz.databinding.FragmentCrimeListBinding
 import com.example.geoquiz.databinding.ItemCrimeBinding
 import com.example.geoquiz.databinding.ItemCrimePoliceBinding
-import java.lang.IllegalArgumentException
 
 class CrimeListFragment : Fragment() {
     private lateinit var binding: FragmentCrimeListBinding
@@ -93,7 +92,7 @@ class CrimeListFragment : Fragment() {
     private inner class CrimeAdapter(var crimes: List<Crime>): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         override fun getItemViewType(position: Int): Int =
-            if (crimes[position].requiresPolice) {
+            if (crimes[position].isSolved) {
                 POLICE_VIEW_TYPE
             } else {
                 CRIME_VIEW_TYPE
