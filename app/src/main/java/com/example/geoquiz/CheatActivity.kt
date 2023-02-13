@@ -20,7 +20,6 @@ class CheatActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCheatBinding
     private var answerIsTrue = false
     private var cheatFlag by Delegates.notNull<Boolean>()
-    private var cheatCount by Delegates.notNull<Int>()
     private var getCheatCount by Delegates.notNull<Int>()
 
     private val cheatViewModel: CheatViewModel by lazy {
@@ -32,7 +31,6 @@ class CheatActivity : AppCompatActivity() {
         binding = ActivityCheatBinding.inflate(layoutInflater).also { setContentView(it.root) }
 
         cheatFlag = cheatViewModel.cheatingFlag
-        cheatCount = cheatViewModel.cheatCount
 
         answerIsTrue = intent.getBooleanExtra(EXTRA_ANSWER_IS_TRUE, false)
         getCheatCount = intent.getIntExtra(EXTRA_GET_CHEAT_COUNT, 0)
@@ -47,11 +45,10 @@ class CheatActivity : AppCompatActivity() {
             }
             cheatViewModel.clickOnCheatButton()
             cheatFlag = cheatViewModel.cheatingFlag
-            cheatCount = cheatViewModel.cheatCount
             binding.answerTextView.setText(answerText)
-            setAnswerShownResult(cheatFlag, getCheatCount)
+            setAnswerShownResult(cheatFlag, cheatViewModel.cheatCount)
         }
-        setAnswerShownResult(cheatFlag, getCheatCount)
+        setAnswerShownResult(cheatFlag, cheatViewModel.cheatCount)
 
         binding.showApiLvl.text = "API Level ${Build.VERSION.SDK_INT}"
     }
