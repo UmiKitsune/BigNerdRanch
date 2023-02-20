@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.geoquiz.databinding.FragmentCrimeListBinding
@@ -16,7 +17,7 @@ import com.example.geoquiz.databinding.ItemCrimePoliceBinding
 class CrimeListFragment : Fragment() {
     private lateinit var binding: FragmentCrimeListBinding
     private val crimeListViewModel: CrimeListViewModel by viewModels()
-    private var adapter: CrimeAdapter? = null
+    private var adapter: CrimeAdapter? = CrimeAdapter(emptyList())
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -25,12 +26,22 @@ class CrimeListFragment : Fragment() {
     ): View {
         binding = FragmentCrimeListBinding.inflate(inflater, container, false)
         binding.crimeRecycleView.layoutManager = LinearLayoutManager(context)
-        updateUI()
+        binding.crimeRecycleView.adapter = adapter
         return binding.root
     }
 
-    private fun updateUI() {
-        val crimes = crimeListViewModel.crimes
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        crimeListViewModel.crimeListLiveData.observe(
+            viewLifecycleOwner,
+            Observer { crimes ->
+                crimes?.let {
+                    updateUI(crimes)
+                }
+            })
+    }
+
+    private fun updateUI(crimes: List<Crime>) {
         adapter = CrimeAdapter(crimes)
         binding.crimeRecycleView.adapter = adapter
     }
@@ -89,7 +100,8 @@ class CrimeListFragment : Fragment() {
         }
     }
 
-    private inner class CrimeAdapter(var crimes: List<Crime>): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    private inner class CrimeAdapter(var crimes: List<Crime>) :
+        RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         override fun getItemViewType(position: Int): Int =
             if (crimes[position].isSolved) {
@@ -100,16 +112,22 @@ class CrimeListFragment : Fragment() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
             val inflater = LayoutInflater.from(parent.context)
-            return when(viewType) {
+            return when (viewType) {
                 CRIME_VIEW_TYPE -> CrimeHolder(ItemCrimeBinding.inflate(inflater, parent, false))
-                POLICE_VIEW_TYPE -> CrimePoliceHolder(ItemCrimePoliceBinding.inflate(inflater, parent, false))
+                POLICE_VIEW_TYPE -> CrimePoliceHolder(
+                    ItemCrimePoliceBinding.inflate(
+                        inflater,
+                        parent,
+                        false
+                    )
+                )
                 else -> throw IllegalArgumentException("Wrong viewType: $viewType")
             }
         }
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
             val crime = crimes[position]
-            when(holder) {
+            when (holder) {
                 is CrimeHolder -> holder.bind(crime)
                 is CrimePoliceHolder -> holder.bind(crime)
             }
