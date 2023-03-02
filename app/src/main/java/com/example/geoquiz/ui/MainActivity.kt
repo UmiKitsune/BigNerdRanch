@@ -1,9 +1,11 @@
-package com.example.geoquiz
+package com.example.geoquiz.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.example.geoquiz.R
+import java.util.*
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), CrimeListFragment.CallBacks {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -17,9 +19,17 @@ class MainActivity : AppCompatActivity() {
             val fragmentList = CrimeListFragment.newInstance()
             supportFragmentManager
                 .beginTransaction()
-                .add(R.id.fragment_container, fragment)
+                .add(R.id.fragment_container, fragmentList)
                 .commit()
         }
+    }
 
+    override fun onCrimeSelected(crimeId: UUID) {
+        val fragment = CrimeFragment.newInstance(crimeId)
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.fragment_container, fragment)
+            .addToBackStack(null)
+            .commit()
     }
 }
